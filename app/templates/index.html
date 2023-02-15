@@ -1,0 +1,26 @@
+{% extends "base.html" %} {% block content %} {% load static%}
+
+<div class="container">
+    </br>
+    <p>文章を入力して送信を押してください。</p>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div>
+          <textarea id="sentence" name="sentence" rows="3" cols="50">{{ input_text }}</textarea>
+        </div>
+        <select name="engine type">
+            <option value="davinci">Davinci(生成エンジン)</option>
+            <option value="curie">Curie</option>
+            <option value="babbage">Babbage</option>
+            <option value="ada">Ada</option>
+        </select>
+        <input type="submit" value="送信">
+    </form>
+    </br>
+    <img class="fit-picture"
+     src="{% static "/media/beautifull-bule-eyes.png"%}"
+     alt="icon" width="100" height="100"> &emsp; {{ response }}
+</div>
+
+    
+{% endblock %}
