@@ -3,14 +3,13 @@ from django.views.generic import TemplateView
 
 import openai
 import os
-import environ
 
+# sample用
+import requests
 
-env = environ.Env()
-env.read_env(os.path.join(os.path.dirname(
-    os.path.dirname(os.path.abspath(__file__))), '.env'))
+# gpt3_key = os.environ['GPT3_KEY']
+a3rt_key = os.environ['A3RT_KEY']
 
-# 対話用のプロンプトエンジニアリングが必要
 class IndexView(TemplateView):
     def get(self, request, *args, **kwargs):
         context = {
@@ -19,25 +18,30 @@ class IndexView(TemplateView):
         return render(request, 'index.html', context)
 
     def post(self, request, *args, **kwargs):
-        openai.api_key = env('GPT3_KEY')
+        # openai.api_key = gpt3_key
         input_text = request.POST['sentence']
         engine_type = request.POST['engine type']
 
-        # 対話用のプロンプトを仕込む
-        response = openai.Completion.create(
-            engine=engine_type,
-            prompt=input_text,
-            temperature=0.7,
-            max_tokens=100,
-            top_p=1,
-            frequency_penalty=1,
-            presence_penalty=0,
+        # response = openai.Completion.create(
+        #     engine=engine_type,
+        #     prompt="Human: " + input_text + "\nAI: ",
+        #     temperature=0.9,
+        #     max_tokens=30,
+        #     top_p=1,
+        #     frequency_penalty=1,
+        #     presence_penalty=0.6,
+        #     stop = ["\n", " Human:", " AI:"]
 
-        )
+        # )
 
-        print(response['choices'][0]['text'])
+        # sample用
+        params = {'apikey': a3rt_key, 'query': input_text}
+
+        response = requests.post('https://api.a3rt.recruit.co.jp/talk/v1/smalltalk', params)
+
+        # print(response['choices'][0]['text'])
         context = {
-            'response': response['choices'][0]['text'],
+            'response': response.json()['results'][0]['reply'],
             'input_text': input_text,
         }
         return render(request, 'index.html', context)
